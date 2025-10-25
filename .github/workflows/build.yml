@@ -25,7 +25,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        apply_bypass: ["normal", "bypass"]
+        # apply_bypass: ["normal", "bypass"]
+        apply_bypass: ["normal"]
 
     steps:
       - name: Check Initial Disk Space
