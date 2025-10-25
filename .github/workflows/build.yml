@@ -250,19 +250,6 @@ jobs:
             sed -i 's/i_uid_into_mnt(i_user_ns(inode), inode)/i_uid_into_mnt(inode->i_sb->s_user_ns, inode)/g' fs/susfs.c
           fi
 
-          # Use ACTUAL_SUBLEVEL for LTS or actual kernel sublevel if available
-          SUBLEVEL_TO_CHECK="${ACTUAL_SUBLEVEL:-${{ inputs.sub_level }}}"
-          if ( [[ "${{ inputs.android_version }}" == "android14" ]] && [[ "${{ inputs.kernel_version }}" == "6.1" ]] && { [[ "$SUBLEVEL_TO_CHECK" =~ ^[0-9]+$ ]] && (( SUBLEVEL_TO_CHECK >= 145 )); } ) \
-            || ( [[ "${{ inputs.android_version }}" == "android15" ]] && [[ "${{ inputs.kernel_version }}" == "6.6" ]] && { [[ "$SUBLEVEL_TO_CHECK" =~ ^[0-9]+$ ]] && (( SUBLEVEL_TO_CHECK >= 98 )); } ); then
-            cp ../../kernel_patches/wild/susfs_fix_patches/v${SUSFS_VERSION}/fix_base.c.patch ./
-            patch -p1 < fix_base.c.patch || true
-          fi
-
-          if ( [[ "${{ inputs.android_version }}" == "android15" ]] && [[ "${{ inputs.kernel_version }}" == "6.6" ]] && (( SUBLEVEL_TO_CHECK <= 58 )); } ); then
-            cp ../../kernel_patches/wild/susfs_fix_patches/v${SUSFS_VERSION}/fix_task_mmu.c.patch ./
-            patch -p1 < fix_task_mmu.c.patch || true
-          fi
-
           # Apply KSU integration patches
           cd ../Wild_KSU
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch .
@@ -446,7 +433,7 @@ jobs:
           echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> "${{ env.DEFCONFIG }}"
 
       - name: Configure Sound
-        if: false
+        if: true
         run: |
           cd "$CONFIG"
           # Sound Configuration
