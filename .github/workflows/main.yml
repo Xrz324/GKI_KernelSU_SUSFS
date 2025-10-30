@@ -31,10 +31,6 @@ on: # push:
         type: choice
         options:
           - All
-          - Android12-5.10
-          - Android13-5.10
-          - Android13-5.15
-          - Android14-5.15
           - Android14-6.1
           - Android15-6.6
         default: All
