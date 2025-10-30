@@ -1,7 +1,7 @@
 name: Kernel Build Process
 permissions:
   contents: write
-  actions: write 
+  actions: write
 
 on:
   workflow_call:
@@ -25,25 +25,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        apply_bypass: ["normal", "bypass"]
+        # apply_bypass: ["normal", "bypass"]
+        apply_bypass: [ "normal" ]
 
     steps:
       - name: Check Initial Disk Space
         run: |
           echo "===== Initial Total Disk Space in GB ====="
           df -BG
-          
+
       - name: Download Apache Arrow's util_free_space.sh
         run: |
           curl -L -o util_free_space.sh https://raw.githubusercontent.com/apache/arrow/main/ci/scripts/util_free_space.sh
           chmod +x util_free_space.sh
           ./util_free_space.sh
-          
+
       - name: Check Disk Space After Cleanup
         run: |
           echo "===== Total Disk Space After Cleanup in GB ====="
           df -BG
-          
+
       - name: Set CONFIG Environment Variable
         run: |
           # Set CONFIG dynamically based on inputs values
@@ -104,7 +105,7 @@ jobs:
           fi
           
           $REPO --trace sync -c -j$(nproc --all) --no-tags --fail-fast
-          
+
       - name: Check Directory Space Usage
         run: |
           echo "===== Total Disk Space After Kernel Download in GB ====="
@@ -123,7 +124,7 @@ jobs:
           
           if [ -f "Makefile" ]; then
             ACTUAL_SUBLEVEL=$(grep '^SUBLEVEL = ' Makefile | awk '{print $3}')
-            
+          
             if [ -n "$ACTUAL_SUBLEVEL" ]; then
               echo "ACTUAL_SUBLEVEL=$ACTUAL_SUBLEVEL" >> $GITHUB_ENV
               echo "Extracted ACTUAL_SUBLEVEL=$ACTUAL_SUBLEVEL; no directory changes performed."
@@ -489,7 +490,7 @@ jobs:
           echo "FILE_NAME=$ARTIFACT_BASE" >> $GITHUB_ENV
 
       - name: Build
-        run : |
+        run: |
           set -e
           set -x
           cd "$CONFIG"
@@ -520,10 +521,10 @@ jobs:
           scan_modules() {
             local search_dir="$1"
             local module_count=0
-            
+          
             if [ -d "$search_dir" ]; then
               echo "Scanning directory: $search_dir"
-              
+          
               # Find all .ko files and report their locations
               while IFS= read -r -d '' module_file; do
                 if [ -f "$module_file" ]; then
@@ -533,7 +534,7 @@ jobs:
                 fi
               done < <(find "$search_dir" -name "*.ko" -type f -print0 2>/dev/null)
             fi
-            
+          
             return $module_count
           }
           
@@ -673,7 +674,7 @@ jobs:
             build_summary.md
           if-no-files-found: ignore
           compression-level: 9
-          
+
       - name: Generate Build Summary
         if: ${{ always() }}
         run: |

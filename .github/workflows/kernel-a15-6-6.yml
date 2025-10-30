@@ -6,7 +6,7 @@ permissions:
 
 on:
   workflow_call:
-    inputs: {}
+    inputs: { }
 
 jobs:
   build-kernels-a15:

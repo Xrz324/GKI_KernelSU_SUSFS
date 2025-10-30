@@ -4,8 +4,7 @@ permissions:
   contents: write
   actions: write
 
-on:
-  # push:
+on: # push:
   #   branches:
   #     - main
   #   paths:
@@ -42,30 +41,6 @@ on:
 
 jobs:
 
-  build-a12-5-10:
-    if: (inputs.build_selection == 'All' || inputs.build_selection == 'Android12-5.10')
-    uses: ./.github/workflows/kernel-a12-5-10.yml
-    secrets: inherit
-
-
-  build-a13-5-10:
-    if: (inputs.build_selection == 'All' || inputs.build_selection == 'Android13-5.10')
-    uses: ./.github/workflows/kernel-a13-5-10.yml
-    secrets: inherit
-
-
-  build-a13-5-15:
-    if: (inputs.build_selection == 'All' || inputs.build_selection == 'Android13-5.15')
-    uses: ./.github/workflows/kernel-a13-5-15.yml
-    secrets: inherit
-
-
-  build-a14-5-15:
-    if: (inputs.build_selection == 'All' || inputs.build_selection == 'Android14-5.15')
-    uses: ./.github/workflows/kernel-a14-5-15.yml
-    secrets: inherit
-
-
   build-a14-6-1:
     if: (inputs.build_selection == 'All' || inputs.build_selection == 'Android14-6.1')
     uses: ./.github/workflows/kernel-a14-6-1.yml
@@ -82,10 +57,6 @@ jobs:
     runs-on: ubuntu-latest
     if: inputs.release_type != 'Actions'
     needs:
-      - build-a12-5-10
-      - build-a13-5-10
-      - build-a13-5-15
-      - build-a14-5-15
       - build-a14-6-1
       - build-a15-6-6
 
@@ -100,15 +71,15 @@ jobs:
       - name: Generate New Tag
         if: inputs.release_type != 'Actions'
         run: |
-            LATEST_TAG=$(gh api repos/${{ github.repository }}/tags --jq '.[0].name' 2>/dev/null || echo "")
-            if [ -z "$LATEST_TAG" ]; then
-              LATEST_TAG="v1.5.12-r0"
-            fi
-            
-            NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{suffix=$2; if (!suffix) suffix=0; suffix++; printf "%s-r%d", $1, suffix}')
-    
-            echo "New tag: $NEW_TAG"
-            echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
+          LATEST_TAG=$(gh api repos/${{ github.repository }}/tags --jq '.[0].name' 2>/dev/null || echo "")
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG="v1.5.12-r0"
+          fi
+          
+          NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{suffix=$2; if (!suffix) suffix=0; suffix++; printf "%s-r%d", $1, suffix}')
+          
+          echo "New tag: $NEW_TAG"
+          echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
 
       - name: Download Artifacts
         uses: actions/download-artifact@v5
@@ -119,7 +90,7 @@ jobs:
       - name: Set release body
         run: |
           cat << 'EOF' > release_body.md
-      
+          
           **IMPORTANT DISCLAIMER**
           This software is provided for testing and educational purposes only. Use at your own risk.
           The developers are not responsible for any damage, data loss, or issues that may occur.
@@ -163,7 +134,7 @@ jobs:
 
           Module: 
           -> https://github.com/sidex15/ksu_module_susfs
-      
+          
           Managers:
           -> WKSU: https://github.com/WildKernels/Wild_KSU
           -> Next: https://github.com/KernelSU-Next/KernelSU-Next
@@ -199,7 +170,7 @@ jobs:
               fi
             done
           fi
-            
+
       - name: Send Telegram Notification
         if: inputs.release_type != 'Actions'
         run: |
